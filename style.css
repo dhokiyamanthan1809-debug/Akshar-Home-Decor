@@ -223,13 +223,22 @@ body::before{
   border-radius: 6px;
   background: linear-gradient(180deg, #2a2118, #171310);
   box-shadow: var(--shadow);
-  overflow:hidden;
+  /* Deliberately no overflow:hidden here. A parent that both clips
+     (overflow:hidden) and hosts a perspective/3D-transformed child is a
+     known trigger for real phone browsers (iOS Safari in particular)
+     failing to paint the child at all — it looks fine in a desktop
+     browser's mobile preview because that isn't the real rendering engine.
+     Nothing inside this box needs the clipping (see .door-glow below for
+     how the rounded corners are kept), so it's left off on purpose. */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 @supports (aspect-ratio: 4 / 5){
   .door-scene{ height:auto; max-height:none; }
 }
 .door-glow{
   position:absolute; inset:0;
+  border-radius: inherit; /* keeps rounded corners without relying on the parent's overflow:hidden */
   background:
     radial-gradient(60% 55% at 68% 45%, rgba(227,182,94,0.55), rgba(227,182,94,0) 70%),
     radial-gradient(90% 70% at 50% 100%, rgba(108,138,118,0.28), rgba(108,138,118,0) 65%);
